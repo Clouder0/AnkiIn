@@ -3,9 +3,9 @@ import json
 from ..log import helper_logger as log
 
 
-def checkOnline():
+def check_online():
     try:
-        getDeckNames()
+        get_deck_names()
     except Exception:
         log.error("Can't connect to anki-connnect.")
         return False
@@ -31,7 +31,7 @@ def invoke(action, **params):
     return response["result"]
 
 
-def addNote(target, deck, options={"allowDuplicate": True}, retry=True):
+def add_note(target, deck, options={"allowDuplicate": True}, retry=True):
     try:
         return invoke("addNote", note={
             "deckName": deck,
@@ -50,30 +50,30 @@ def addNote(target, deck, options={"allowDuplicate": True}, retry=True):
                 options:%s\n
                 retry:%s\n""", target.__str__(), deck, options.__str__(), retry)
             return
-        if "model" in e.args[0] and target.model.modelName not in getModelNamesAndIds().keys():
+        if "model" in e.args[0] and target.model.modelName not in get_model_names_and_ids().keys():
             log.info("Model %s is not found, creating...",
                      target.model.modelName)
-            createModel(target.model)
-        elif "deck was not found" in e.args[0] and deck not in getDeckNames():
+            create_model(target.model)
+        elif "deck was not found" in e.args[0] and deck not in get_deck_names():
             log.info("Deck %s is not found, creating...", deck)
-            createDeck(deck)
+            create_deck(deck)
         if retry:
-            return addNote(target, deck, options, False)
+            return add_note(target, deck, options, False)
 
 
-def createDeck(deckName):
+def create_deck(deckName):
     return invoke("createDeck", deck=deckName)
 
 
-def getModelNamesAndIds():
+def get_model_names_and_ids():
     return invoke("modelNamesAndIds")
 
 
-def getDeckNames():
+def get_deck_names():
     return invoke("deckNames")
 
 
-def createModel(model):
+def create_model(model):
     return invoke("createModel",
                   modelName=model.modelName,
                   inOrderFields=model.fields,
@@ -83,6 +83,6 @@ def createModel(model):
                   )
 
 
-def addNotes(notes, deck, options={"allowDuplicate": True}):
+def add_notes(notes, deck, options={"allowDuplicate": True}):
     for x in notes:
-        addNote(x, deck, options)
+        add_note(x, deck, options)

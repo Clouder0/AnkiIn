@@ -2,7 +2,7 @@ import sys
 import os
 import pkgutil
 import importlib
-from notetypes import Choices, Cloze, ListCloze, QA, TableCloze
+from .notetypes import Choices, Cloze, ListCloze, QA, TableCloze
 from .log import importer_logger as log
 
 discovered_notetypes = []
@@ -10,8 +10,7 @@ discovered_notetypes = []
 
 def get_notetypes():
     global discovered_notetypes
-    print(len(discovered_notetypes))
-    if len(discovered_notetypes) == 0:
+    if len(discovered_notetypes) > 0:
         return discovered_notetypes
     discovered_notetypes = [Choices, Cloze, ListCloze, QA, TableCloze]
     sys.path.append("." + os.sep + "notetypes" + os.sep)

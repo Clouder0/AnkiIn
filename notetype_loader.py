@@ -10,7 +10,8 @@ discovered_notetypes = []
 
 def get_notetypes():
     global discovered_notetypes
-    if discovered_notetypes is not None:
+    print(len(discovered_notetypes))
+    if len(discovered_notetypes) == 0:
         return discovered_notetypes
     discovered_notetypes = [Choices, Cloze, ListCloze, QA, TableCloze]
     sys.path.append("." + os.sep + "notetypes" + os.sep)
@@ -18,5 +19,5 @@ def get_notetypes():
     discovered_notetypes.extend(
         importlib.import_module(name) for finder, name, ispkg in pkgutil.iter_modules() if name.startswith("notetype_"))
     discovered_notetypes.sort(key=lambda x: x.priority, reverse=True)
-    log.info("Loaded notetypes:\n%s", discovered_notetypes)
+    log.info("Loaded notetypes:\n%s", discovered_notetypes.__str__())
     return discovered_notetypes

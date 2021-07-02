@@ -48,7 +48,7 @@ def addNote(target, deck, options={"allowDuplicate": True}, retry=True):
                 target:%s\n
                 deck:%s\n
                 options:%s\n
-                retry:%s\n""", target, deck, options, retry)
+                retry:%s\n""", target.__str__(), deck, options.__str__(), retry)
             return
         if "model" in e.args[0] and target.model.modelName not in getModelNamesAndIds().keys():
             log.info("Model %s is not found, creating...",

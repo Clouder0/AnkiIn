@@ -8,23 +8,27 @@ log_config = {
     "disable_existing_loggers": False,
     "loggers": {
         "": {
-            "level": "INFO"
+            "level": "INFO",
+            "handlers": ["console"]
         },
         "notetype": {
-            "level": "INFO"
+            "level": "INFO",
+            "handlers": ["console"]
         },
         "parser": {
-            "level": "INFO"
+            "level": "INFO",
+            "handlers": ["console"]
         },
         "helper": {
-            "level": "INFO"
+            "level": "INFO",
+            "handlers": ["console"]
         },
     },
     "handlers": {
         "console": {
             "level": "WARNING",
             "formatter": "standard",
-            "class": "logging.StreamHanlder",
+            "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout"
         },
     },

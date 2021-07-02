@@ -28,5 +28,7 @@ def handle_post(text: str):
     notes = text.split("\n\n")
     noteList = []
     for note in notes:
-        noteList.append(get_note(note))
+        ret = get_note(note)
+        if ret is not None:
+            noteList.append(ret)
     return noteList

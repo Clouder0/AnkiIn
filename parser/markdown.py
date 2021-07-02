@@ -15,12 +15,11 @@ def get_note(text: str) -> Note:
     for now in get_notetypes():
         try:
             if now.check(lines):
-                nlog.debug("Recognized as:%s", text,
-                           now.__name__.split(".")[-1])
+                nlog.debug("Recognized as:%s", now.__name__.split(".")[-1])
                 return now.get(text, tags=config.tags)
         except Exception:
             nlog.exception("Exception Occured when handling:\n%s", text)
-    log.debug("Unmatching any format", text)
+    log.debug("Unmatching any format")
 
 
 def handle_post(text: str):

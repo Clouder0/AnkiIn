@@ -1,3 +1,6 @@
+from . import log
+
+
 deck_name = "Export"
 tags = []
 file_list = []
@@ -8,19 +11,19 @@ log_config = {
     "disable_existing_loggers": False,
     "loggers": {
         "": {
-            "level": "INFO",
+            "level": "DEBUG",
             "handlers": ["console"]
         },
         "notetype": {
-            "level": "INFO",
+            "level": "DEBUG",
             "handlers": ["console"]
         },
         "parser": {
-            "level": "INFO",
+            "level": "DEBUG",
             "handlers": ["console"]
         },
         "helper": {
-            "level": "INFO",
+            "level": "DEBUG",
             "handlers": ["console"]
         },
     },
@@ -38,3 +41,7 @@ log_config = {
         },
     },
 }
+
+
+def complete_config():
+    log.logging.config.dictConfig(log_config)

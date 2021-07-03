@@ -41,6 +41,7 @@ log_config = {
         },
     },
 }
+notetype_settings = {}
 
 
 def complete_config():

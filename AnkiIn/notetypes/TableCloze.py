@@ -14,5 +14,5 @@ def check(lines: list) -> bool:
     return "|" in lines[0] and "|" in lines[1] and "-" in lines[1] and "|" in lines[2]
 
 
-def get(text, tags):
-    return cget(text, tags)
+def get(text: str, deck: str = "Export", tags: list = []):
+    return cget(text=text, deck=deck, tags=tags)

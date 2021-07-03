@@ -12,5 +12,5 @@ def check(lines: list) -> bool:
     return lines[0].startswith("- ")
 
 
-def get(text: str, tags: list = []):
-    return cget(text, tags)
+def get(text: str, deck: str = "Export", tags: list = []):
+    return cget(text=text, deck=deck, tags=tags)

@@ -14,7 +14,7 @@ def check(lines: list) -> bool:
     return len(lines) >= 3 and lines[1][0] == "A"
 
 
-def get(text: str, tags: list = []) -> Note:
+def get(text: str, deck: str = "Export", tags: list = []) -> Note:
     lines = text.split("\n")
     question = lines[0]
     options = list()
@@ -35,7 +35,13 @@ def get(text: str, tags: list = []) -> Note:
         raise Exception("Error! Choices with no answer.")
     if i < len(lines):
         remark = list2str(lines[i:])
-    return ChoicesNote(question, options, answer, remark, _tags=tags)
+    return ChoicesNote(
+        question=question,
+        options=options,
+        answer=answer,
+        remark=remark,
+        deck=deck,
+        tags=tags)
 
 
 FRONT = r"""<!--tuxzz.20201115.v0.r0-->
@@ -448,6 +454,7 @@ _model = Model(
 
 
 class ChoicesNote(Note):
-    def __init__(self, question, options, answer, remark, model=_model, _tags=("#Export",)):
-        super().__init__(model, {
-            "Question": question, "Options": options, "Answer": answer, "Remark": remark}, _tags)
+    def __init__(self, question, options, answer, remark, model=_model, deck="Export", tags=("#Export",)):
+        super().__init__(model=model, fields={
+            "Question": question, "Options": options, "Answer": answer, "Remark": remark},
+            deck=deck, tags=tags)

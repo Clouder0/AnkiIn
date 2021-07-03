@@ -5,7 +5,6 @@ from ..notetype_loader import get_notetypes
 from .. import config
 from ..helper.formatHelper import linestrip, list2str
 from enum import Enum
-import regex
 
 
 def get_note(text: str) -> Note:
@@ -18,7 +17,8 @@ def get_note(text: str) -> Note:
     config_backup = []
     if lines[0] == "[inlineconfig]" and r"[/inlineconfig]" in lines:
         ind = lines.index(r"[/inlineconfig]")
-        execute_config(list2str(lines[1:ind]), config_backup)
+        config_backup = config.execute_config(
+            config.parse_config(list2str(lines[1:ind])))
         lines = lines[ind + 1:]
         text = list2str(lines)
 
@@ -27,11 +27,12 @@ def get_note(text: str) -> Note:
             try:
                 if now.check(lines):
                     nlog.debug("Recognized as:%s", now.notetype_name)
-                    return now.get(text, tags=config.tags)
+                    return now.get(text, deck=config.deck_name, tags=config.tags)
             except Exception:
                 nlog.exception("Exception Occured when handling:\n%s", text)
     log.debug("Unmatching any format")
-    revert_config(config_backup)
+    config_backup.reverse()
+    config.execute_config(config_backup, keep_backup=False)
 
 
 def handle_post(text: str):
@@ -84,58 +85,16 @@ def build_tree(text) -> SyntaxNode:
     return root
 
 
-def execute_config(text: str, config_backup: list):
-    config_list = parseinlineconfig(text)
-    for y in config_list:
-        if not hasattr(config, y[0]):
-            log.warning("Invalid config:\n%s", y.__str__())
-            break
-    # backup the old value
-    config_backup.append([y[0], getattr(config, y[0])])
-    log.info("Set Config %s to %s", y[0], y[1])
-    setattr(config, y[0], y[1])
-
-
-def revert_config(config_backup: list):
-    config_backup.reverse()
-    for x in config_backup:
-        log.info("Revert Config %s to %s", x[0], x[1])
-        setattr(config, x[0], x[1])
-
-
 def dfs(now: SyntaxNode, nodeList):
     config_backup = []  # save the operations for rolling back
     for x in now.sons:
         if x.NodeType is NodeType.Heading:
             dfs(x, nodeList)
         elif x.value.startswith(r"[config]"):
-            execute_config(x.value, config_backup)
+            config_backup += config.execute_config(config.parse_config(x.value))
         else:
             ret = get_note(x.value)
             if ret is not None:
                 nodeList.append(ret)
-    revert_config(config_backup)
-
-
-def parseinlineconfig(text: str):
-    log.debug("Parsing config:\n%s", text)
-    matches = regex.finditer(r"^(.+)=(.+)$", text, regex.M)
-    if matches is None:
-        return
-    for x in matches:
-        key = x.group(1).strip()
-        value = x.group(2).strip()
-        value = str(value)
-        if value.lower() == "true":
-            value = True
-        elif value.lower() == "false":
-            value = False
-        elif value.startswith("[") and value.endswith("]"):
-            value = value[1:-1]
-            if "," in value:
-                value = value.split(",")
-            elif "，" in value:
-                value = value.split("，")
-            else:
-                value = [value]
-        yield [key, value]
+    config_backup.reverse()
+    config.execute_config(config_backup, keep_backup=False)

@@ -15,7 +15,7 @@ def check(lines: list) -> bool:
     return len(lines) >= 2
 
 
-def get(text: str, tags: list = []) -> Note:
+def get(text: str, deck: str = "Export", tags: list = []) -> Note:
     lines = text.splitlines()
     front = lines[0]
     back = list2str(lines[1:], '', '\n')
@@ -25,7 +25,7 @@ def get(text: str, tags: list = []) -> Note:
     if back == "":
         log.info("Blank back text, skipping.")
         return
-    return QANote(front, back, _tags=tags)
+    return QANote(front=front, back=back, deck=deck, tags=tags)
 
 
 BACK = r"""{{FrontSide}}
@@ -68,5 +68,6 @@ _model = Model(
 
 
 class QANote(Note):
-    def __init__(self, front, back, model=_model, _tags=("#Export",)):
-        super().__init__(model, {"Front": front, "Back": back}, _tags)
+    def __init__(self, front, back, model=_model, deck="Export", tags=("#Export",)):
+        super().__init__(model=model, fields={
+            "Front": front, "Back": back}, deck=deck, tags=tags)

@@ -31,10 +31,10 @@ def invoke(action, **params):
     return response["result"]
 
 
-def add_note(target, deck, options={"allowDuplicate": True}, retry=True):
+def add_note(target, options={"allowDuplicate": True}, retry=True):
     try:
         return invoke("addNote", note={
-            "deckName": deck,
+            "deckName": target.deck,
             "modelName": target.model.modelName,
             "fields": target.outputfields,
             "options": options,
@@ -48,17 +48,17 @@ def add_note(target, deck, options={"allowDuplicate": True}, retry=True):
                 target:%s\n
                 deck:%s\n
                 options:%s\n
-                retry:%s\n""", target.__str__(), deck, options.__str__(), retry)
+                retry:%s\n""", target.__str__(), target.deck, options.__str__(), retry)
             return
         if "model" in e.args[0] and target.model.modelName not in get_model_names_and_ids().keys():
             log.info("Model %s is not found, creating...",
                      target.model.modelName)
             create_model(target.model)
-        elif "deck was not found" in e.args[0] and deck not in get_deck_names():
-            log.info("Deck %s is not found, creating...", deck)
-            create_deck(deck)
+        elif "deck was not found" in e.args[0] and target.deck not in get_deck_names():
+            log.info("Deck %s is not found, creating...", target.deck)
+            create_deck(target.deck)
         if retry:
-            return add_note(target, deck, options, False)
+            return add_note(target, options, False)
 
 
 def create_deck(deckName):
@@ -83,6 +83,6 @@ def create_model(model):
                   )
 
 
-def add_notes(notes, deck, options={"allowDuplicate": True}):
+def add_notes(notes, options={"allowDuplicate": True}):
     for x in notes:
-        add_note(x, deck, options)
+        add_note(x, options)

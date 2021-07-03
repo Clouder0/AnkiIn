@@ -16,7 +16,7 @@ def check(lines: list) -> bool:
     return "**" in lines[0]
 
 
-def get(text: str, tags: list = []) -> Note:
+def get(text: str, deck: str = "Export", tags: list = []) -> Note:
     sub = text.split("**")
     output = ""
     # odd indexes are clozes
@@ -40,7 +40,7 @@ def get(text: str, tags: list = []) -> Note:
                     pid = id
         else:
             output = output + x
-    return ClozeNote(output, _tags=tags)
+    return ClozeNote(text=output, deck=deck, tags=tags)
 
 
 CSS = r""".card {
@@ -88,5 +88,6 @@ _model = Model(
 
 
 class ClozeNote(Note):
-    def __init__(self, text, model=_model, _tags=("#Export",)):
-        super().__init__(model, {"Text": text, "Back Extra": ""}, _tags)
+    def __init__(self, text, model=_model, deck="Export", tags=("#Export",)):
+        super().__init__(model=model, fields={
+            "Text": text, "Back Extra": ""}, deck=deck, tags=tags)

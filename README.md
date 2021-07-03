@@ -8,6 +8,8 @@
 [![Contributors][contributors-shield]][contributors-url]
 [![CodeFactor][codefactor-shield]][codefactor-url]
 
+See [AnkiLink Project](https://github.com/users/Clouder0/projects/1) for future plans.
+
 ## Introduction
 
 AnkiIn is a Python Package that enables you to generate Anki cards from markdown text.  

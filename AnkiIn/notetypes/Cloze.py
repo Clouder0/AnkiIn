@@ -1,6 +1,7 @@
 from ..note import Note
 from ..model import Model
 from ..config import notetype_settings as settings
+from ..log import notetype_logger as log
 
 
 notetype_name = "Cloze"
@@ -18,8 +19,6 @@ def check(lines: list) -> bool:
 def get(text: str, tags: list = []) -> Note:
     sub = text.split("**")
     output = ""
-    if len(sub) == 0:
-        raise Exception("Invalid Cloze format, skipping.")
     # odd indexes are clozes
     pid = 0
     for i, x in enumerate(sub):

@@ -2,6 +2,7 @@ from ..helper.formatHelper import list2str
 from ..note import Note
 from ..model import Model
 from ..config import notetype_settings as settings
+from ..log import notetype_logger as log
 
 
 notetype_name = "Choices"
@@ -15,15 +16,15 @@ def check(lines: list) -> bool:
 
 
 def get(text: str, tags: list = []) -> Note:
-    if not check(text):
-        raise Exception("Not QA format.")
     lines = text.splitlines()
     front = lines[0]
     back = list2str(lines[1:], '', '\n')
     if front == "":
-        raise Exception("Blank front text, skipping.")
+        log.info("Blank front text, skipping.")
+        return
     if back == "":
-        raise Exception("Blank back text, skipping.")
+        log.info("Blank back text, skipping.")
+        return
     return QANote(front, back, _tags=tags)
 
 

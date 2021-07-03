@@ -1,9 +1,13 @@
 from ..helper.formatHelper import list2str
 from ..note import Note
 from ..model import Model
+from ..config import notetype_settings as settings
 
 
-priority = 10
+notetype_name = "Choices"
+if notetype_name not in settings:
+    settings[notetype_name] = {}
+priority = settings[notetype_name].get("priority", 10)
 
 
 def check(lines: list) -> bool:

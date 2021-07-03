@@ -1,7 +1,11 @@
 from .Cloze import get as cget
+from ..config import notetype_settings as settings
 
 
-priority = 10
+notetype_name = "ListCloze"
+if notetype_name not in settings:
+    settings[notetype_name] = {}
+priority = settings[notetype_name].get("priority", 10)
 
 
 def check(lines: list) -> bool:

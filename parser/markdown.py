@@ -15,7 +15,7 @@ def get_note(text: str) -> Note:
     for now in get_notetypes():
         try:
             if now.check(lines):
-                nlog.debug("Recognized as:%s", now.__name__.split(".")[-1])
+                nlog.debug("Recognized as:%s", now.notetype_name)
                 return now.get(text, tags=config.tags)
         except Exception:
             nlog.exception("Exception Occured when handling:\n%s", text)

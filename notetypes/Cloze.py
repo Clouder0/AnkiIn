@@ -3,9 +3,12 @@ from ..model import Model
 from ..config import notetype_settings as settings
 
 
-clozeNumberPrefix = settings[__name__].get("clozeNumberPrefix", "[")
-clozeNumberSuffix = settings[__name__].get("clozeNumberSuffix", "]")
-priority = settings[__name__].get("priority", 20)
+notetype_name = "Cloze"
+if notetype_name not in settings:
+    settings[notetype_name] = {}
+clozeNumberPrefix = settings[notetype_name].get("clozeNumberPrefix", "[")
+clozeNumberSuffix = settings[notetype_name].get("clozeNumberSuffix", "]")
+priority = settings[notetype_name].get("priority", 20)
 
 
 def check(lines: list) -> bool:

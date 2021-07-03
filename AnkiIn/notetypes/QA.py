@@ -5,7 +5,7 @@ from ..config import notetype_settings as settings
 from ..log import notetype_logger as log
 
 
-notetype_name = "Choices"
+notetype_name = "QA"
 if notetype_name not in settings:
     settings[notetype_name] = {}
 priority = settings[notetype_name].get("priority", 10)

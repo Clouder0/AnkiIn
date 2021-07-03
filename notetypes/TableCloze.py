@@ -4,7 +4,7 @@ from .Cloze import get as cget
 priority = 15
 
 
-def check(lines):
+def check(lines: list) -> bool:
     if len(lines) < 3:
         return False
     return "|" in lines[0] and "|" in lines[1] and "-" in lines[1] and "|" in lines[2]

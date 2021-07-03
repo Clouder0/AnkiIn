@@ -6,7 +6,7 @@ clozeNumberSuffix = "]"
 priority = 20
 
 
-def check(lines: list):
+def check(lines: list) -> bool:
     return "**" in lines[0]
 
 

@@ -4,7 +4,7 @@ from . import log
 deck_name = "Export"
 tags = []
 file_list = []
-output = False  # output to file
+output = False
 output_path = ""
 log_config = {
     "version": 1,

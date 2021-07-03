@@ -6,11 +6,11 @@ from ..model import Model
 priority = 10
 
 
-def check(lines):
+def check(lines: list) -> bool:
     return len(lines) >= 2
 
 
-def get(text, tags):
+def get(text: str, tags: list = []) -> Note:
     if not check(text):
         raise Exception("Not QA format.")
     lines = text.splitlines()

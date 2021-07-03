@@ -6,11 +6,11 @@ from ..model import Model
 priority = 15
 
 
-def check(lines):
+def check(lines: list) -> bool:
     return len(lines) >= 3 and lines[1][0] == "A"
 
 
-def get(text, tags):
+def get(text: str, tags: list = []) -> Note:
     lines = text.split("\n")
     question = lines[0]
     options = list()

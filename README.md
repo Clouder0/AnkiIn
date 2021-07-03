@@ -66,7 +66,7 @@ pip install AnkiIn
 
 ### install Anki Connect
 
-To use the lib, you need to install [AnkiConnect](https://github.com/FooSoft/anki-connect) extension.
+To use the lib, you need to install [AnkiConnect](https://github.com/FooSoft/anki-connect) extension.  
 Code:`2055492159`  
 For detailed installation guide, please visit the [anki-connect repo](https://github.com/FooSoft/anki-connect).
 
@@ -78,13 +78,12 @@ Also, [AnkiIn Wiki](https://github.com/Clouder0/AnkiIn/wiki) is under constructi
 
 For more syntax examples, see [tests](https://github.com/Clouder0/AnkiIn/tree/main/tests).
 
-## Alternatives
+## Applications
 
-Tons of Anki Importers out there. Here are some alternatives, some of which may suit your need.
+I'd like to list some applications using AnkiIn here.  
+If you want to add yours, please create an issue/pull request.
 
-- [apy](https://github.com/lervag/apy): need to install Anki source, directly write to Anki database without opening Anki or importing apkg into Anki. Linux-friendly.
-- [Anki-Import](https://github.com/sdondley/Anki-Import): similar syntax with my AnkiIn but too many linebreaks. Lack of markdown support. Haven't been updated for years.
-- [inka](https://github.com/lazy-void/inka): yet another a powerful tool.
+- [AnkiLink](https://github.com/Clouder0/AnkiLink)
 
 ## Credit
 

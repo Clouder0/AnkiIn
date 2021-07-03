@@ -66,13 +66,11 @@ def build_tree(text) -> SyntaxNode:
         if x.replace("\n", "").replace(" ", "") == "":
             continue  # skip blank block
         now = SyntaxNode()
-        if x.startswith("#"):
+        if x.startswith("#") and x.lstrip("#")[0] == " ":
             now.NodeType = NodeType.Heading
-            level = 1
-            while level < len(x) and x[level] == "#":
-                level = level + 1
-            now.value = [level, x[level + 1:].strip()]
-            while level <= path[-1].value[0]:
+            xx = x.split(" ")
+            now.value = [len(xx[0]), xx[1]]
+            while now.value[0] <= path[-1].value[0]:
                 path.pop()
             now.parent = path[-1]
             path[-1].sons.append(now)

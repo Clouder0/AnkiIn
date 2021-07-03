@@ -2,6 +2,8 @@ from . import log
 
 
 deck_name = "Export"
+skip = False
+mathjax = True
 tags = []
 file_list = []
 output = False

@@ -16,7 +16,7 @@ log.info("Loaded notetypes:\n%s", discovered_notetypes.__str__())
 
 def sort_notetypes():
     discovered_notetypes.sort(key=lambda x: x.priority, reverse=True)
-    log.info("Sorted notetypes:\n%s", discovered_notetypes.__str__())
+    log.debug("Sorted notetypes:\n%s", discovered_notetypes.__str__())
 
 
 config_updater.append(sort_notetypes)

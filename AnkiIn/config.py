@@ -51,6 +51,9 @@ dict = {
             "clozeNumberPrefix": r"\[",
             "clozeNumberSuffix": r"\]",
         },
+        "MQA": {
+            "prefix": r"!",
+        },
     }
 }
 

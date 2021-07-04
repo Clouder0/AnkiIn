@@ -12,25 +12,27 @@ if notetype_name not in conf["notetype"]:
 settings = conf["notetype"][notetype_name]
 
 priority = None
+prefix = None
 
 
 def update_choices_config():
-    global settings, priority
-    
+    global settings, priority, prefix
+
     priority = settings.get("priority", 12)
+    prefix = settings.get("prefix", "!")
 
 
 config_updater.append(update_choices_config)
 
 
 def check(lines: list) -> bool:
-    return len(lines) >= 2 and lines[0][0] == "!"
+    return len(lines) >= 2 and lines[0][0] == prefix
 
 
 def get(text: str, deck: str = "Export", tags: list = []) -> Note:
     lines = text.splitlines()
     ind = 0
-    while ind < len(lines) and lines[ind][0] == "!":
+    while ind < len(lines) and lines[ind][0] == prefix:
         lines[ind] = lines[ind][1:]
         ind = ind + 1
     if ind == len(lines):

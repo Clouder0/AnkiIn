@@ -2,44 +2,45 @@ from ..note import Note
 from ..model import Model
 from ..config import notetype_settings as settings
 from ..log import notetype_logger as log
+import re
 
 
 notetype_name = "Cloze"
 if notetype_name not in settings:
     settings[notetype_name] = {}
-clozeNumberPrefix = settings[notetype_name].get("clozeNumberPrefix", "[")
-clozeNumberSuffix = settings[notetype_name].get("clozeNumberSuffix", "]")
+clozeNumberPrefix = settings[notetype_name].get("clozeNumberPrefix", r"\[")
+clozeNumberSuffix = settings[notetype_name].get("clozeNumberSuffix", r"\]")
+clozePrefix = settings[notetype_name].get("clozePrefix", r"\*\*")
+clozeSuffix = settings[notetype_name].get("clozeSuffix", r"\*\*")
 priority = settings[notetype_name].get("priority", 20)
+reg = re.compile("{}({}([0-9]+?){})?(.+?){}".format(
+    clozePrefix,
+    clozeNumberPrefix,
+    clozeNumberSuffix,
+    clozeSuffix))
+log.debug("Regex compiled:%s", reg.__str__())
 
 
 def check(lines: list) -> bool:
-    return "**" in lines[0]
+    return reg.search(lines[0]) is not None
 
 
 def get(text: str, deck: str = "Export", tags: list = []) -> Note:
-    sub = text.split("**")
+    global reg
+    subs = reg.finditer(text)
     output = ""
     # odd indexes are clozes
     pid = 0
-    for i, x in enumerate(sub):
-        if(i % 2 == 1):
-            id = pid + 1
-            try:
-                if x.startswith(clozeNumberPrefix):
-                    p = x.find(clozeNumberSuffix)
-                    now = x[1:p]
-                    if not now.isdigit():
-                        raise Exception()
-                    id = int(now)
-                    x = x[p + 1:]
-            except Exception:
-                pass
-            finally:
-                output = output + "{{c" + str(id) + "::" + x + "}}"
-                if id == pid + 1:
-                    pid = id
-        else:
-            output = output + x
+    last = 0
+    for sub in subs:
+        x = sub.group(3)
+        id = pid + 1 if sub.group(2) is None else sub.group(2)
+        log.debug("Cloze:\n%s\nid:%d", x, id)
+        output = output + text[last:sub.start()] + "{{c" + str(id) + "::" + x + "}}"
+        last = sub.end()
+        if id == pid + 1:
+            pid = id
+    output = output + text[last:]
     return ClozeNote(text=output, deck=deck, tags=tags)
 
 

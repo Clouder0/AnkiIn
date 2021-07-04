@@ -1,6 +1,6 @@
 from . import config, log
 from .log import importer_logger as logger
-import regex
+import re
 
 
 deck_name = "Export"
@@ -54,7 +54,7 @@ def complete_config():
 
 def parse_config(text: str):
     logger.debug("Parsing config:\n%s", text)
-    matches = regex.finditer(r"^(.+)=(.+)$", text, regex.M)
+    matches = re.finditer(r"^(.+)=(.+)$", text, re.M)
     if matches is None:
         return
     for x in matches:

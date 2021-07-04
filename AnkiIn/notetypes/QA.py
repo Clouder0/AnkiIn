@@ -1,14 +1,24 @@
 from ..helper.formatHelper import list2str
 from ..note import Note
 from ..model import Model
-from ..config import notetype_settings as settings
+from ..config import dict as conf
+from ..config import config_updater
 from ..log import notetype_logger as log
 
 
 notetype_name = "QA"
-if notetype_name not in settings:
-    settings[notetype_name] = {}
-priority = settings[notetype_name].get("priority", 10)
+if notetype_name not in conf["notetype"]:
+    conf["notetype"][notetype_name] = {}
+settings = conf["notetype"][notetype_name]
+priority = None
+
+
+def update_choices_config():
+    global settings, priority
+    priority = settings.get("priority", 10)
+
+
+config_updater.append(update_choices_config)
 
 
 def check(lines: list) -> bool:

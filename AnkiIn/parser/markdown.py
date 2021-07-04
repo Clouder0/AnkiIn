@@ -1,38 +1,38 @@
 from ..note import Note
 from ..log import parser_logger as log
 from ..log import notetype_logger as nlog
-from ..notetype_loader import get_notetypes
+from .. import notetype_loader
 from .. import config
+from ..config import dict as conf
 from ..helper.formatHelper import linestrip, list2str
 from enum import Enum
 
 
 def get_note(text: str) -> Note:
-    log.debug("Handling:%s", text)
+    log.debug("Handling:\n%s", text)
     lines = text.splitlines(keepends=False)
     if len(lines) == 0:
         log.debug("Blank line, skipped.")
         return
 
-    config_backup = []
+    config_backup = None
     if lines[0] == "[inlineconfig]" and r"[/inlineconfig]" in lines:
         ind = lines.index(r"[/inlineconfig]")
-        config_backup = config.execute_config(
-            config.parse_config(list2str(lines[1:ind])))
+        config_backup = config.parse_config(list2str(lines[1:ind]))
         lines = lines[ind + 1:]
         text = list2str(lines)
 
-    if not config.skip:
-        for now in get_notetypes():
+    if not conf["skip"]:
+        for now in notetype_loader.discovered_notetypes:
             try:
                 if now.check(lines):
                     nlog.debug("Recognized as:%s", now.notetype_name)
-                    return now.get(text, deck=config.deck_name, tags=config.tags)
+                    return now.get(text, deck=conf["deck_name"], tags=conf["tags"])
             except Exception:
                 nlog.exception("Exception Occured when handling:\n%s", text)
     log.debug("Unmatching any format")
-    config_backup.reverse()
-    config.execute_config(config_backup, keep_backup=False)
+    if config_backup is not None:
+        config.execute_config(config_backup)
 
 
 def handle_post(text: str):
@@ -84,15 +84,18 @@ def build_tree(text) -> SyntaxNode:
 
 
 def dfs(now: SyntaxNode, nodeList):
-    config_backup = []  # save the operations for rolling back
+    # save the operations for rolling back
+    config_backups = []
     for x in now.sons:
         if x.NodeType is NodeType.Heading:
             dfs(x, nodeList)
         elif x.value.startswith(r"[config]"):
-            config_backup += config.execute_config(config.parse_config(x.value))
+            config_backups.append(config.parse_config(
+                list2str(x.value.splitlines()[1:])))
         else:
             ret = get_note(x.value)
             if ret is not None:
                 nodeList.append(ret)
-    config_backup.reverse()
-    config.execute_config(config_backup, keep_backup=False)
+    config_backups.reverse()
+    for x in config_backups:
+        config.execute_config(x)

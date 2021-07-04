@@ -1,24 +1,39 @@
 from ..note import Note
 from ..model import Model
-from ..config import notetype_settings as settings
+from ..config import dict as conf
+from ..config import config_updater
 from ..log import notetype_logger as log
 import re
 
 
 notetype_name = "Cloze"
-if notetype_name not in settings:
-    settings[notetype_name] = {}
-clozeNumberPrefix = settings[notetype_name].get("clozeNumberPrefix", r"\[")
-clozeNumberSuffix = settings[notetype_name].get("clozeNumberSuffix", r"\]")
-clozePrefix = settings[notetype_name].get("clozePrefix", r"\*\*")
-clozeSuffix = settings[notetype_name].get("clozeSuffix", r"\*\*")
-priority = settings[notetype_name].get("priority", 20)
-reg = re.compile("{}({}([0-9]+?){})?(.+?){}".format(
-    clozePrefix,
-    clozeNumberPrefix,
-    clozeNumberSuffix,
-    clozeSuffix))
-log.debug("Regex compiled:%s", reg.__str__())
+if notetype_name not in conf["notetype"]:
+    conf["notetype"][notetype_name] = {}
+settings = conf["notetype"][notetype_name]
+clozeNumberPrefix = None
+clozeNumberSuffix = None
+clozePrefix = None
+clozeSuffix = None
+priority = None
+reg = None
+
+
+def update_cloze_config():
+    global settings, clozeNumberPrefix, clozeNumberSuffix, clozePrefix, clozeSuffix, priority, reg
+    clozeNumberPrefix = settings.get("clozeNumberPrefix", r"\[")
+    clozeNumberSuffix = settings.get("clozeNumberSuffix", r"\]")
+    clozePrefix = settings.get("clozePrefix", r"\*\*")
+    clozeSuffix = settings.get("clozeSuffix", r"\*\*")
+    priority = settings.get("priority", 20)
+    reg = re.compile("{}({}([0-9]+?){})?(.+?){}".format(
+        clozePrefix,
+        clozeNumberPrefix,
+        clozeNumberSuffix,
+        clozeSuffix))
+    log.debug("Regex compiled:%s", reg.__str__())
+
+
+config_updater.append(update_cloze_config)
 
 
 def check(lines: list) -> bool:
@@ -35,6 +50,7 @@ def get(text: str, deck: str = "Export", tags: list = []) -> Note:
     for sub in subs:
         x = sub.group(3)
         id = pid + 1 if sub.group(2) is None else sub.group(2)
+        id = int(id)
         log.debug("Cloze:\n%s\nid:%d", x, id)
         output = output + text[last:sub.start()] + "{{c" + str(id) + "::" + x + "}}"
         last = sub.end()

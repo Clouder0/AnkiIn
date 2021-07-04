@@ -1,5 +1,5 @@
 import markdown2
-from .. import config
+from ..config import dict as conf
 
 # python version is 3.7, so str.removesuffix/prefix is not supported.
 
@@ -113,7 +113,7 @@ def format_text(text):
 
     text = line_tweaks(lines)  # tweak for tables and lists
     text = markdown2html(text)
-    if config.mathjax:
+    if conf["mathjax"]:
         text = replace_brackets(text, "$", "\\(", "\\)")
     return text
 

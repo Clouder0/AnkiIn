@@ -1,90 +1,96 @@
+import collections
+from typing import Dict
 from . import config, log
-from .log import importer_logger as logger
-import re
+from .log import main_logger as logger
+import toml
 
-
-deck_name = "Export"
-skip = False
-mathjax = True
-tags = []
-file_list = []
-output = False
-output_path = ""
-log_config = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "loggers": {
-        "": {
-            "level": "DEBUG",
-            "handlers": ["console"]
+dict = {
+    "deck_name": "Export",
+    "skip": False,
+    "mathjax": True,
+    "tags": [],
+    "log_config": {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "loggers": {
+            "main": {
+                "level": "DEBUG",
+                "handlers": ["console"]
+            },
+            "notetype": {
+                "level": "DEBUG",
+                "handlers": ["console"]
+            },
+            "parser": {
+                "level": "DEBUG",
+                "handlers": ["console"]
+            },
+            "helper": {
+                "level": "DEBUG",
+                "handlers": ["console"]
+            },
         },
-        "notetype": {
-            "level": "DEBUG",
-            "handlers": ["console"]
+        "handlers": {
+            "console": {
+                "level": "WARNING",
+                "formatter": "standard",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout"
+            },
         },
-        "parser": {
-            "level": "DEBUG",
-            "handlers": ["console"]
-        },
-        "helper": {
-            "level": "DEBUG",
-            "handlers": ["console"]
-        },
-    },
-    "handlers": {
-        "console": {
-            "level": "WARNING",
-            "formatter": "standard",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout"
-        },
-    },
-    "formatters": {
-        'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        "formatters": {
+            'standard': {
+                'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            },
         },
     },
+    "notetype": {
+        "Cloze": {
+            "clozePrefix": r"\*\*",
+            "clozeSuffix": r"\*\*",
+            "clozeNumberPrefix": r"\[",
+            "clozeNumberSuffix": r"\]",
+        },
+    }
 }
-notetype_settings = {}
 
 
-def complete_config():
-    log.logging.config.dictConfig(log_config)
+def load_logging_config():
+    log.logging.config.dictConfig(dict["log_config"])
 
 
-def parse_config(text: str):
-    logger.debug("Parsing config:\n%s", text)
-    matches = re.finditer(r"^(.+)=(.+)$", text, re.M)
-    if matches is None:
-        return
-    for x in matches:
-        key = x.group(1).strip()
-        value = x.group(2).strip()
-        value = str(value)
-        if value.lower() == "true":
-            value = True
-        elif value.lower() == "false":
-            value = False
-        elif value.startswith("[") and value.endswith("]"):
-            value = value[1:-1]
-            if "," in value:
-                value = value.split(",")
-            elif "，" in value:
-                value = value.split("，")
-            else:
-                value = [value]
-        yield [key, value]
+config_updater = [load_logging_config, ]
 
 
-def execute_config(config_list: list, keep_backup=True):
-    config_history = []
-    for x in config_list:
-        if not hasattr(config, x[0]):
-            logger.warning("Invalid config:\n%s", x.__str__())
-            continue
-        # backup the old value
-        if keep_backup:
-            config_history.append([x[0], getattr(config, x[0])])
-        logger.info("Set Config %s to %s", x[0], x[1])
-        setattr(config, x[0], x[1])
-    return config_history
+def update_config():
+    for x in config_updater:
+        x()
+
+
+def merge_dictionary(d1: Dict, d2: Dict) -> Dict:
+    backup = {}
+    for key, val in d2.items():
+        if key in d1 and isinstance(d1[key], collections.Mapping) \
+                and isinstance(val, collections.Mapping):
+            backup[key] = merge_dictionary(d1[key], val)
+        else:
+            backup[key] = d1[key] if key in d1 else None
+            d1[key] = val
+    return backup
+
+
+def parse_config(text: str) -> Dict:
+    logger.info("Executing config:\n%s", text)
+    ret = execute_config(toml.loads(text))
+    logger.debug("Config updated:\n%s", toml.dumps(dict))
+    return ret
+
+
+def execute_config(conf: Dict) -> Dict:
+    ret = merge_dictionary(dict, conf)
+    update_config()
+    return ret
+
+
+update_config()  # load the default config
+logger.debug("Config loaded:\n%s", toml.dumps(dict))

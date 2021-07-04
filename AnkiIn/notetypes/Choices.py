@@ -1,13 +1,23 @@
 from ..helper.formatHelper import list2str, format_text
 from ..note import Note
 from ..model import Model
-from ..config import notetype_settings as settings
+from ..config import dict as conf
+from ..config import config_updater
 
 
 notetype_name = "Choices"
-if notetype_name not in settings:
-    settings[notetype_name] = {}
-priority = settings[notetype_name].get("priority", 15)
+if notetype_name not in conf["notetype"]:
+    conf["notetype"][notetype_name] = {}
+settings = conf["notetype"][notetype_name]
+priority = None
+
+
+def update_choices_config():
+    global settings, priority
+    priority = settings.get("priority", 15)
+
+
+config_updater.append(update_choices_config)
 
 
 def check(lines: list) -> bool:

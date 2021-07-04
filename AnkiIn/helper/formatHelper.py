@@ -125,3 +125,11 @@ def get_title(text: str):
         if x.startswith("# "):
             return x[2:].strip()
     return None
+
+
+def is_emptytext(text: str) -> bool:
+    lines = [x.strip() for x in text.splitlines()]
+    for x in lines:
+        if x != "":
+            return False
+    return True

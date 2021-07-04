@@ -2,6 +2,7 @@ from ..note import Note
 from ..log import parser_logger as log
 from ..log import notetype_logger as nlog
 from .. import notetype_loader
+from ..helper.formatHelper import is_emptytext
 from .. import config
 from ..config import dict as conf
 from ..helper.formatHelper import linestrip, list2str
@@ -22,7 +23,7 @@ def get_note(text: str) -> Note:
         lines = lines[ind + 1:]
         text = list2str(lines)
 
-    if not conf["skip"]:
+    if not conf["skip"] and not is_emptytext(text):
         for now in notetype_loader.discovered_notetypes:
             try:
                 if now.check(lines):

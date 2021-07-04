@@ -15,18 +15,18 @@ priority = None
 prefix = None
 
 
-def update_choices_config():
+def update_mqa_config():
     global settings, priority, prefix
 
     priority = settings.get("priority", 12)
     prefix = settings.get("prefix", "!")
 
 
-config_updater.append(update_choices_config)
+config_updater.append(update_mqa_config)
 
 
 def check(lines: list) -> bool:
-    return len(lines) >= 2 and lines[0][0] == prefix
+    return len(lines) >= 2 and len(lines[0]) >= 1 and lines[0][0] == prefix
 
 
 def get(text: str, deck: str = "Export", tags: list = []) -> Note:

@@ -11,13 +11,13 @@ settings = conf["notetype"][notetype_name]
 priority = None
 
 
-def update_choices_config():
+def update_table_cloze_config():
     global settings, priority
 
     priority = settings.get("priority", 15)
 
 
-config_updater.append(update_choices_config)
+config_updater.append(update_table_cloze_config)
 
 
 def check(lines: list) -> bool:

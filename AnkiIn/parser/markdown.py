@@ -31,6 +31,7 @@ def get_note(text: str) -> Note:
             except Exception:
                 nlog.exception("Exception Occured when handling:\n%s", text)
     log.debug("Unmatching any format")
+
     if config_backup is not None:
         config.execute_config(config_backup)
 
@@ -56,7 +57,7 @@ class SyntaxNode:
         self.type = type
 
 
-def build_tree(text) -> SyntaxNode:
+def build_tree(text: str) -> SyntaxNode:
     # Build a syntax tree for Markdown
     blocks = text.split("\n\n")
     root = SyntaxNode()
@@ -86,6 +87,7 @@ def build_tree(text) -> SyntaxNode:
 def dfs(now: SyntaxNode, nodeList):
     # save the operations for rolling back
     config_backups = []
+
     for x in now.sons:
         if x.NodeType is NodeType.Heading:
             dfs(x, nodeList)
@@ -96,6 +98,7 @@ def dfs(now: SyntaxNode, nodeList):
             ret = get_note(x.value)
             if ret is not None:
                 nodeList.append(ret)
+
     config_backups.reverse()
     for x in config_backups:
         config.execute_config(x)

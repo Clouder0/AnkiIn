@@ -9,6 +9,7 @@ notetype_name = "Choices"
 if notetype_name not in conf["notetype"]:
     conf["notetype"][notetype_name] = {}
 settings = conf["notetype"][notetype_name]
+
 priority = None
 
 
@@ -45,6 +46,7 @@ def get(text: str, deck: str = "Export", tags: list = []) -> Note:
         raise Exception("Error! Choices with no answer.")
     if i < len(lines):
         remark = list2str(lines[i:])
+
     return ChoicesNote(
         question=question,
         options=options,

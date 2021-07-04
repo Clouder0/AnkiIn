@@ -64,7 +64,8 @@ def line_tweaks(lines: list) -> str:
     inList, inTable = False, False
     text = ""
     # table start tweak. if a table starts from the first line,
-    # #it won"t be rendered as an empty line is added at first
+    # it won"t be rendered as an empty line is added at first
+
     # table start
     if not inTable and "|" in lines[0] and \
             1 < len(lines) and "|" in lines[1] and "-" in lines[1]:

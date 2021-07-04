@@ -10,6 +10,7 @@ notetype_name = "Cloze"
 if notetype_name not in conf["notetype"]:
     conf["notetype"][notetype_name] = {}
 settings = conf["notetype"][notetype_name]
+
 clozeNumberPrefix = None
 clozeNumberSuffix = None
 clozePrefix = None
@@ -20,6 +21,7 @@ reg = None
 
 def update_cloze_config():
     global settings, clozeNumberPrefix, clozeNumberSuffix, clozePrefix, clozeSuffix, priority, reg
+
     clozeNumberPrefix = settings.get("clozeNumberPrefix", r"\[")
     clozeNumberSuffix = settings.get("clozeNumberSuffix", r"\]")
     clozePrefix = settings.get("clozePrefix", r"\*\*")
@@ -30,6 +32,7 @@ def update_cloze_config():
         clozeNumberPrefix,
         clozeNumberSuffix,
         clozeSuffix))
+
     log.debug("Regex compiled:%s", reg.__str__())
 
 

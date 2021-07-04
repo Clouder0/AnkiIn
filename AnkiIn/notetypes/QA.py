@@ -10,11 +10,13 @@ notetype_name = "QA"
 if notetype_name not in conf["notetype"]:
     conf["notetype"][notetype_name] = {}
 settings = conf["notetype"][notetype_name]
+
 priority = None
 
 
 def update_choices_config():
     global settings, priority
+
     priority = settings.get("priority", 10)
 
 

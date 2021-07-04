@@ -1,6 +1,6 @@
 import collections
 from typing import Dict
-from . import config, log
+from . import log
 from .log import main_logger as logger
 import toml
 

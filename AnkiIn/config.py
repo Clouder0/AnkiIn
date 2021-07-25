@@ -62,12 +62,13 @@ def load_logging_config():
     log.logging.config.dictConfig(dict["log_config"])
 
 
-config_updater = [load_logging_config, ]
+config_updater = [(load_logging_config, 0), ]
 
 
 def update_config():
+    config_updater.sort(key=lambda x: x[1])
     for x in config_updater:
-        x()
+        x[0]()
 
 
 def merge_dictionary(d1: Dict, d2: Dict) -> Dict:

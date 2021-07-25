@@ -17,7 +17,7 @@ def update_table_cloze_config():
     priority = settings.get("priority", 15)
 
 
-config_updater.append(update_table_cloze_config)
+config_updater.append((update_table_cloze_config, 10))
 
 
 def check(lines: list) -> bool:

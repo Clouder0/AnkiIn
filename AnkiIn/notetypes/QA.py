@@ -20,7 +20,7 @@ def update_qa_config():
     priority = settings.get("priority", 10)
 
 
-config_updater.append(update_qa_config)
+config_updater.append((update_qa_config, 10))
 
 
 def check(lines: list) -> bool:

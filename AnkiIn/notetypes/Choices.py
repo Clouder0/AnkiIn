@@ -18,7 +18,7 @@ def update_choices_config():
     priority = settings.get("priority", 15)
 
 
-config_updater.append(update_choices_config)
+config_updater.append((update_choices_config, 10))
 
 
 def check(lines: list) -> bool:

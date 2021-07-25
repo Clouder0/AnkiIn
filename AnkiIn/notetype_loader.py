@@ -19,4 +19,4 @@ def sort_notetypes():
     log.debug("Sorted notetypes:\n%s", discovered_notetypes.__str__())
 
 
-config_updater.append(sort_notetypes)
+config_updater.append((sort_notetypes, 20))

@@ -36,7 +36,7 @@ def update_cloze_config():
     log.debug("Regex compiled:%s", reg.__str__())
 
 
-config_updater.append(update_cloze_config)
+config_updater.append((update_cloze_config, 10))
 
 
 def check(lines: list) -> bool:

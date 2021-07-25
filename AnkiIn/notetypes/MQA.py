@@ -22,7 +22,7 @@ def update_mqa_config():
     prefix = settings.get("prefix", "!")
 
 
-config_updater.append(update_mqa_config)
+config_updater.append((update_mqa_config, 10))
 
 
 def check(lines: list) -> bool:

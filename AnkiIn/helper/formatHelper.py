@@ -1,4 +1,5 @@
 import markdown2
+import re
 from ..config import dict as conf
 
 # python version is 3.7, so str.removesuffix/prefix is not supported.
@@ -106,6 +107,26 @@ def line_tweaks(lines: list) -> str:
     return text
 
 
+ESCAPE_STR = "!ESCAPER{}!"
+
+
+def escape_brackets(text: str, left: str, right: str):
+    recover_dict = {}
+    subs = re.finditer(left + r"(.+?)" + right, text)
+    result_text = ""
+    id = 0
+    last = 0
+    for sub in subs:
+        content = sub.group(1)
+        escape_str = ESCAPE_STR.format(id)
+        recover_dict[escape_str] = content
+        id = id + 1
+        result_text = result_text + text[last:sub.start()] + escape_str
+        last = sub.end()
+    result_text = result_text + text[last:]
+    return result_text, recover_dict
+
+
 def format_text(text):
     lines = text.splitlines()
 
@@ -113,9 +134,12 @@ def format_text(text):
         return ""
 
     text = line_tweaks(lines)  # tweak for tables and lists
+    if conf["mathjax"]:
+        text, math_dict = escape_brackets(text, r"\$", r"\$")
     text = markdown2html(text)
     if conf["mathjax"]:
-        text = replace_brackets(text, "$", "\\(", "\\)")
+        for key, val in math_dict.items():
+            text = text.replace(key, r"\({}\)".format(val))
     return text
 
 

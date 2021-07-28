@@ -25,11 +25,11 @@ def update_mqa_config():
 config_updater.append((update_mqa_config, 10))
 
 
-def check(lines: list) -> bool:
+def check(lines: list, extra_params={}) -> bool:
     return len(lines) >= 2 and len(lines[0]) >= 1 and lines[0][0] == prefix
 
 
-def get(text: str, deck: str = "Export", tags: list = []) -> Note:
+def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
     lines = text.splitlines()
     ind = 0
     while ind < len(lines) and lines[ind][0] == prefix:

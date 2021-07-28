@@ -20,9 +20,9 @@ def update_list_cloze_config():
 config_updater.append((update_list_cloze_config, 10))
 
 
-def check(lines: list) -> bool:
+def check(lines: list, extra_params={}) -> bool:
     return lines[0].startswith("- ")
 
 
-def get(text: str, deck: str = "Export", tags: list = []):
+def get(text: str, deck: str, tags: list, extra_params={}):
     return cget(text=text, deck=deck, tags=tags)

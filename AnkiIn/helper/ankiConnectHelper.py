@@ -86,3 +86,11 @@ def create_model(model):
 def add_notes(notes, options={"allowDuplicate": True}):
     for x in notes:
         add_note(x, options)
+
+
+def find_notes(query: str):
+    return invoke("findNotes", query=query)
+
+
+def update_note_fields(id: str, Note):
+    invoke("updateNoteFields", note={"id": id, "fields": Note.outputfields})

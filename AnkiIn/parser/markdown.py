@@ -9,7 +9,7 @@ from ..helper.formatHelper import linestrip, list2str
 from enum import Enum
 
 
-def get_note(text: str) -> Note:
+def get_note(text: str, extra_params={}) -> Note:
     log.debug("Handling:\n%s", text)
     lines = text.splitlines(keepends=False)
     if len(lines) == 0:
@@ -26,9 +26,9 @@ def get_note(text: str) -> Note:
     if not conf["skip"] and not is_emptytext(text):
         for now in notetype_loader.discovered_notetypes:
             try:
-                if now.check(lines):
+                if now.check(lines=lines, extra_params=extra_params):
                     nlog.debug("Recognized as:%s", now.notetype_name)
-                    return now.get(text, deck=conf["deck_name"], tags=conf["tags"])
+                    return now.get(text=text, deck=conf["deck_name"], tags=conf["tags"], extra_params=extra_params)
             except Exception:
                 nlog.exception("Exception Occured when handling:\n%s", text)
     log.debug("Unmatching any format")

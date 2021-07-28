@@ -23,11 +23,11 @@ def update_qa_config():
 config_updater.append((update_qa_config, 10))
 
 
-def check(lines: list) -> bool:
+def check(lines: list, extra_params={}) -> bool:
     return len(lines) >= 2
 
 
-def get(text: str, deck: str = "Export", tags: list = []) -> Note:
+def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
     lines = text.splitlines()
     front = lines[0]
     back = list2str(lines[1:], '', '\n')
@@ -80,6 +80,7 @@ _model = Model(
 
 
 class QANote(Note):
-    def __init__(self, front, back, model=_model, deck="Export", tags=("#Export",)):
-        super().__init__(model=model, fields={
+    def __init__(self, front, back, deck, tags):
+        global _model
+        super().__init__(model=_model, fields={
             "Front": front, "Back": back}, deck=deck, tags=tags)

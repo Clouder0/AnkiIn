@@ -39,11 +39,11 @@ def update_cloze_config():
 config_updater.append((update_cloze_config, 10))
 
 
-def check(lines: list) -> bool:
+def check(lines: list, extra_params={}) -> bool:
     return reg.search(lines[0]) is not None
 
 
-def get(text: str, deck: str = "Export", tags: list = []) -> Note:
+def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
     global reg
     subs = reg.finditer(text)
     output = ""
@@ -108,6 +108,7 @@ _model = Model(
 
 
 class ClozeNote(Note):
-    def __init__(self, text, model=_model, deck="Export", tags=("#Export",)):
-        super().__init__(model=model, fields={
+    def __init__(self, text, deck, tags):
+        global _model
+        super().__init__(model=_model, fields={
             "Text": text, "Back Extra": ""}, deck=deck, tags=tags)

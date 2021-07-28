@@ -21,11 +21,11 @@ def update_choices_config():
 config_updater.append((update_choices_config, 10))
 
 
-def check(lines: list) -> bool:
+def check(lines: list, extra_params={}) -> bool:
     return len(lines) >= 3 and lines[1][0] == "A"
 
 
-def get(text: str, deck: str = "Export", tags: list = []) -> Note:
+def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
     lines = text.split("\n")
     question = lines[0]
     options = list()
@@ -466,7 +466,8 @@ _model = Model(
 
 
 class ChoicesNote(Note):
-    def __init__(self, question, options, answer, remark, model=_model, deck="Export", tags=("#Export",)):
-        super().__init__(model=model, fields={
+    def __init__(self, question, options, answer, remark, deck="Export", tags=("#Export",)):
+        global _model
+        super().__init__(model=_model, fields={
             "Question": question, "Options": options, "Answer": answer, "Remark": remark},
             deck=deck, tags=tags)

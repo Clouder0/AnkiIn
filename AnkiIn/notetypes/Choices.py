@@ -28,8 +28,7 @@ def check(lines: list, extra_params={}) -> bool:
 def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
     lines = text.split("\n")
     question = lines[0]
-    options = list()
-    remark = ""
+    options = []
     i = 1
     while i < len(lines):
         if lines[i][0] != chr(65 + i - 1):
@@ -39,14 +38,11 @@ def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
     if len(options) <= 1:
         raise Exception("Error! Choices with only one option.")
     options = list2str(options)
-    if i < len(lines):
-        answer = list2str([x for x in lines[i] if ord(x) >= 65 and ord(x) <= 90], "", "")
-        i += 1
-    else:
+    if i >= len(lines):
         raise Exception("Error! Choices with no answer.")
-    if i < len(lines):
-        remark = list2str(lines[i:])
-
+    answer = list2str([x for x in lines[i] if ord(x) >= 65 and ord(x) <= 90], "", "")
+    i += 1
+    remark = list2str(lines[i:]) if i < len(lines) else ""
     return ChoicesNote(
         question=question,
         options=options,

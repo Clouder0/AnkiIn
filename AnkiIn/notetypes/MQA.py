@@ -34,7 +34,7 @@ def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
     ind = 0
     while ind < len(lines) and lines[ind][0] == prefix:
         lines[ind] = lines[ind][1:]
-        ind = ind + 1
+        ind += 1
     if ind == len(lines):
         log.warning("No answer is provides for MQA when handling:\n%s", text)
         return

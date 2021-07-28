@@ -10,9 +10,8 @@ AuthCookie = ""
 
 def post(url: str, **params):
     try:
-        response = requests.post(url, data=json.dumps(
+        return requests.post(url, data=json.dumps(
             params), cookies={"siyuan": AuthCookie})
-        return response
     except Exception:
         raise Exception
 
@@ -26,11 +25,8 @@ class AuthCodeIncorrectException(Exception):
 
 
 def parse_ial(text: str):
-    ret = {}
     subs = re.finditer(r" (.+?)=\"(.+?)\"", text)
-    for sub in subs:
-        ret[sub.group(1)] = sub.group(2)
-    return ret
+    return {sub.group(1): sub.group(2) for sub in subs}
 
 
 def login(password: str):

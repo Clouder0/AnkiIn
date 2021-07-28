@@ -59,7 +59,7 @@ def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
         last = sub.end()
         if id == pid + 1:
             pid = id
-    output = output + text[last:]
+    output += text[last:]
     return ClozeNote(text=output, deck=deck, tags=tags)
 
 

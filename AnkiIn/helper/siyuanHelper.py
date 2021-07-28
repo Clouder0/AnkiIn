@@ -5,17 +5,23 @@ import re
 
 API_URL = "http://127.0.0.1:6806/api/"
 HEADERS = {"Content-Type": "application/json"}
+AuthCookie = ""
 
 
 def post(url: str, **params):
     try:
-        response = requests.post(url, data=json.dumps(params))
-        return response.json()
-    except Exception as e:
-        raise e
+        response = requests.post(url, data=json.dumps(
+            params), cookies={"siyuan": AuthCookie})
+        return response
+    except Exception:
+        raise Exception
 
 
 class ApiException(Exception):
+    pass
+
+
+class AuthCodeIncorrectException(Exception):
     pass
 
 
@@ -25,6 +31,15 @@ def parse_ial(text: str):
     for sub in subs:
         ret[sub.group(1)] = sub.group(2)
     return ret
+
+
+def login(password: str):
+    res = post(API_URL + "system/loginAuth", authCode=password)
+    if res.json()["code"] != 0:
+        raise AuthCodeIncorrectException
+    global AuthCookie
+    AuthCookie = res.cookies.get("siyuan")
+    print(AuthCookie)
 
 
 class Block:
@@ -71,7 +86,7 @@ def get_block(dict) -> Block:
 
 
 def query_sql(SQL: str):
-    result = post(API_URL + "query/sql", stmt=SQL)
+    result = post(API_URL + "query/sql", stmt=SQL).json()
     if result["code"] == 0:
         return result["data"]
     raise ApiException(result)
@@ -106,6 +121,7 @@ def get_property_by_id(id: str, property_name: str):
 
 
 def do_property_exist_by_id(id: str, property_name: str):
+    # print(id)
     ial = get_col_by_id(id, "ial")
     return property_name in ial
 

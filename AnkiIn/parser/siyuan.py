@@ -1,7 +1,7 @@
 from ..helper.siyuanHelper import do_property_exist_by_id, get_parent_by_id, query_sql, get_col_by_id
 from . import markdown
-from ..notetype_loader import discovered_notetypes, sort_notetypes
-from ..notetypes.Siyuan import SQA
+from ..notetype_loader import discovered_notetypes
+from ..notetypes.Siyuan import SQA, SMQA, SCloze, SListCloze, STableCloze
 from ..config import update_config
 
 
@@ -19,9 +19,8 @@ roots = []
 noteList = []
 
 
-discovered_notetypes.append(SQA)
+discovered_notetypes += [SQA, SMQA, SCloze, SListCloze, STableCloze]
 update_config()
-sort_notetypes()
 
 
 def build_tree(now: str):
@@ -41,21 +40,23 @@ def build_tree(now: str):
     now_node.parent = fa
     # print("fa {} added son {}".format(fa.id, now_node.id))
     fa.sons.append(now_node)
-    print("fa {} sons:".format(fa.id))
-    print([x.id for x in fa.sons])
+    # print("fa {} sons:".format(fa.id))
+    # print([x.id for x in fa.sons])
     return now_node
 
 
 def sync(last_time: str):
     link.clear()
     roots.clear()
+    noteList.clear()
     all_blocks = [x["id"] for x in query_sql(
         r"SELECT id FROM blocks where updated>'{}'".format(last_time))]
-    print(all_blocks)
+    # print(all_blocks)
     for x in all_blocks:
         build_tree(x)
     for x in roots:
         dfs(x)
+    return noteList
 
 
 def dfs(now: SyntaxNode):
@@ -63,7 +64,11 @@ def dfs(now: SyntaxNode):
     # print([x.id for x in now.sons])
     if len(now.sons) == 0:
         # leaf
-        noteList.append(markdown.get_note(get_col_by_id(now.id, "markdown")))
+        note = markdown.get_note(get_col_by_id(
+            now.id, "markdown"), extra_params={"SiyuanID": now.id})
+        if note is None:
+            return
+        noteList.append(note)
         return
     for x in now.sons:
         # pass down config

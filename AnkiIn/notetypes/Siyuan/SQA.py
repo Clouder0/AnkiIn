@@ -1,8 +1,10 @@
 from ...note import Note
 from ..QA import get as super_get
+from ..QA import check as super_check
 from ...model import Model
 from ...config import dict as conf
 from ...config import config_updater
+from ..QA import QANote
 
 
 notetype_name = "SQA"
@@ -13,24 +15,21 @@ settings = conf["notetype"][notetype_name]
 priority = None
 
 
-def update_sqa_config():
+def update_siyuan_qa_config():
     global settings, priority
 
     priority = settings.get("priority", 11)
 
 
-config_updater.append((update_sqa_config, 10))
+config_updater.append((update_siyuan_qa_config, 10))
 
 
-def check(lines: list) -> bool:
-    return len(lines) >= 2
+def check(lines: list, extra_params={}) -> bool:
+    return super_check(lines=lines, extra_params=extra_params)
 
 
-def get(text: str, deck: str = "Export", tags: list = [], SiyuanID: str = "") -> Note:
-    res = super_get(text, deck, tags)
-    res.fields["SiyuanID"] = SiyuanID
-    res.model = _model
-    return res
+def get(text: str, deck: str, tags: list, extra_params={}) -> Note:
+    return SQANote(extra_params["SiyuanID"], super_get(text=text, deck=deck, tags=tags, extra_params=extra_params))
 
 
 BACK = r"""{{FrontSide}}
@@ -72,3 +71,17 @@ _model = Model(
     ],
     css=CSS
 )
+
+
+class SQANote(QANote):
+    def __init__(self, SiyuanID, front, back, deck, tags):
+        global _model
+        super.__init__(front=front, back=back, deck=deck, tags=tags)
+        self.model = _model
+        self["SiyuanID"] = SiyuanID
+
+    def __init__(self, SiyuanID, Note):
+        global _model
+        self.__dict__.update(Note.__dict__)
+        self.model = _model
+        self["SiyuanID"] = SiyuanID

@@ -1,11 +1,21 @@
 import requests
 import json
 import re
+from ..config import dict as conf
+from ..config import config_updater
 
 
 API_URL = "http://127.0.0.1:6806/api/"
 HEADERS = {"Content-Type": "application/json"}
 AuthCookie = ""
+
+
+def update_siyuan_helper():
+    global API_URL
+    API_URL = conf["siyuan"].get("api_url", "http://127.0.0.1:6806/api/")
+
+
+config_updater.append((update_siyuan_helper, 5))
 
 
 def post(url: str, **params):
@@ -27,7 +37,7 @@ class AuthCodeIncorrectException(Exception):
 
 def parse_ial(text: str):
     ret = {}
-    subs = re.finditer(r" (.+?)=\"(.+?)\"", text)
+    subs = re.finditer(r" (.+?)=\"(.+?)\"", text, flags=re.DOTALL)
     for sub in subs:
         ret[sub.group(1)] = sub.group(2)
     return ret
@@ -114,7 +124,8 @@ def get_col_by_id(id: str, attr_name: str):
 
 def get_property_by_id(id: str, property_name: str):
     ial = get_col_by_id(id, "ial")
-    match = re.search(r" {}=\"(.+?)\"".format(property_name), ial)
+    match = re.search(r" {}=\"(.+?)\"".format(property_name),
+                      ial, flags=re.DOTALL)
     if match is None:
         raise Exception("Property Not Found.")
     return match.group(1)

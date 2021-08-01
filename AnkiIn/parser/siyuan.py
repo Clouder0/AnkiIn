@@ -1,4 +1,5 @@
-from ..helper.siyuanHelper import do_property_exist_by_id, get_parent_by_id, get_property_by_id, query_sql, get_col_by_id
+from ..helper.siyuanHelper import PropertyNotFoundException, do_property_exist_by_id, get_parent_by_id
+from ..helper.siyuanHelper import get_property_by_id, query_sql, get_col_by_id
 from . import markdown
 from ..notetype_loader import discovered_notetypes
 from ..notetypes.Siyuan import SQA, SMQA, SCloze, SListCloze, STableCloze
@@ -6,6 +7,7 @@ from ..config import update_config
 from ..config import dict as conf
 from ..config import config_updater
 from .. import config
+from ..log import parser_logger as logger
 
 
 class SyntaxNode:
@@ -36,11 +38,17 @@ update_config()
 
 def build_tree(now: str):
     # print("visit:{}".format(now))
+    # print("build tree")
+    # print(get_col_by_id(now, "markdown"))
     now_node = SyntaxNode(now)
     link[now] = now_node
-    if do_property_exist_by_id(now, tag_attr_name):
-        roots.append(now_node)
-        return now_node
+    try:
+        if do_property_exist_by_id(now, tag_attr_name):
+            roots.append(now_node)
+            return now_node
+    except Exception:
+        logger.exception("Exception occurred! Invalid Siyuan ID {}".format(now))
+        logger.exception(Exception)
     fa_id = get_parent_by_id(now)
     if fa_id == "":
         return now_node
@@ -61,10 +69,12 @@ def sync(last_time: str):
     roots.clear()
     noteList.clear()
     all_blocks = [x["id"] for x in query_sql(
-        r"SELECT id FROM blocks where updated>'{}'".format(last_time))]
+        r"SELECT id FROM blocks where updated>'{}' and type='p'".format(last_time))]
     # print(all_blocks)
     for x in all_blocks:
         build_tree(x)
+    # print([x.id for x in roots])
+    # print([get_col_by_id(x.id,"markdown") for x in roots])
     for x in roots:
         dfs(x)
     return noteList
@@ -73,12 +83,20 @@ def sync(last_time: str):
 def dfs(now: SyntaxNode):
     # print("dfs: " + now.id)
     # print([x.id for x in now.sons])
-    has_config = do_property_exist_by_id(now.id, tag_attr_name)
-    if has_config:
+    current_config = None
+    config_backup = None
+    try:
         current_config = get_property_by_id(
             now.id, tag_attr_name).replace(r"&quot;", "\"")
         config_backup = config.parse_config(current_config)
+    except PropertyNotFoundException:
+        logger.info("SiyuanID:{} has not config.".format(now.id))
+    except Exception:
+        logger.warning(
+            "An error occurred while parsing config.\nSiyuanID:{}\nProperty:\n{}".format(now.id, current_config))
     if len(now.sons) == 0:
+        # print("!!!")
+        # print(get_col_by_id(now.id, "markdown"))
         # leaf
         note = markdown.get_note(get_col_by_id(
             now.id, "markdown"), extra_params={"SiyuanID": now.id})
@@ -88,5 +106,5 @@ def dfs(now: SyntaxNode):
     else:
         for x in now.sons:
             dfs(x)
-    if has_config:
+    if config_backup is not None:
         config.execute_config(config_backup)

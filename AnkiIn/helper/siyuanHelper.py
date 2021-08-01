@@ -7,12 +7,14 @@ from ..config import config_updater
 
 API_URL = "http://127.0.0.1:6806/api/"
 HEADERS = {"Content-Type": "application/json"}
-AuthCookie = ""
+TOKEN = ""
 
 
 def update_siyuan_helper():
-    global API_URL
+    global API_URL, TOKEN
     API_URL = conf["siyuan"].get("api_url", "http://127.0.0.1:6806/api/")
+    TOKEN = conf["siyuan"].get("api_token", "")
+    HEADERS["Authorization"] = "Token {}".format(TOKEN)
 
 
 config_updater.append((update_siyuan_helper, 5))
@@ -21,7 +23,7 @@ config_updater.append((update_siyuan_helper, 5))
 def post(url: str, **params):
     try:
         response = requests.post(url, data=json.dumps(
-            params), cookies={"siyuan": AuthCookie})
+            params), headers=HEADERS)
         return response
     except Exception:
         raise Exception
@@ -41,15 +43,6 @@ def parse_ial(text: str):
     for sub in subs:
         ret[sub.group(1)] = sub.group(2)
     return ret
-
-
-def login(password: str):
-    res = post(API_URL + "system/loginAuth", authCode=password)
-    if res.json()["code"] != 0:
-        raise AuthCodeIncorrectException
-    global AuthCookie
-    AuthCookie = res.cookies.get("siyuan")
-    print(AuthCookie)
 
 
 class Block:
@@ -122,12 +115,16 @@ def get_col_by_id(id: str, attr_name: str):
     return res[0][attr_name]
 
 
+class PropertyNotFoundException(Exception):
+    pass
+
+
 def get_property_by_id(id: str, property_name: str):
     ial = get_col_by_id(id, "ial")
     match = re.search(r" {}=\"(.+?)\"".format(property_name),
                       ial, flags=re.DOTALL)
     if match is None:
-        raise Exception("Property Not Found.")
+        raise PropertyNotFoundException
     return match.group(1)
 
 

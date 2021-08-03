@@ -15,10 +15,10 @@ priority = None
 def update_siyuan_list_cloze_config():
     global settings, priority
 
-    priority = settings.get("priority", 10)
+    priority = settings.get("priority", 16)
 
 
-config_updater.append((update_siyuan_list_cloze_config, 10))
+config_updater.append((update_siyuan_list_cloze_config, 16))
 
 
 def check(lines: list, extra_params={}) -> bool:

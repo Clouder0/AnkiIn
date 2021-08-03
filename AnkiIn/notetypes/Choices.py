@@ -22,7 +22,7 @@ config_updater.append((update_choices_config, 10))
 
 
 def check(lines: list, extra_params={}) -> bool:
-    return len(lines) >= 3 and lines[1][0] == "A"
+    return len(lines) >= 3 and len(lines[1]) >= 1 and lines[1][0] == "A"
 
 
 def get(text: str, deck: str, tags: list, extra_params={}) -> Note:

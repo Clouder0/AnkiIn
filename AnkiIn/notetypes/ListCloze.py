@@ -14,14 +14,14 @@ priority = None
 def update_list_cloze_config():
     global settings, priority
 
-    priority = settings.get("priority", 10)
+    priority = settings.get("priority", 15)
 
 
-config_updater.append((update_list_cloze_config, 10))
+config_updater.append((update_list_cloze_config, 15))
 
 
 def check(lines: list, extra_params={}) -> bool:
-    return lines[0].startswith("- ")
+    return lines[0].startswith("- ") or lines[0].startswith(r"* ")
 
 
 def get(text: str, deck: str, tags: list, extra_params={}):

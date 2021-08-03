@@ -98,13 +98,25 @@ def dfs(now: SyntaxNode):
         # print("!!!")
         # print(get_col_by_id(now.id, "markdown"))
         # leaf
-        note = markdown.get_note(get_col_by_id(
-            now.id, "markdown"), extra_params={"SiyuanID": now.id})
-        if note is None:
-            return
-        noteList.append(note)
+        handle(now)
     else:
         for x in now.sons:
             dfs(x)
     if config_backup is not None:
         config.execute_config(config_backup)
+
+
+def handle(now: SyntaxNode):
+    fa = get_parent_by_id(now.id)
+    if get_col_by_id(now.id, "type") == "i" or fa != "" and get_col_by_id(fa, "type") == "i":
+        handle(now.parent)
+    else:
+        addNote(now.id)
+
+
+def addNote(id):
+    note = markdown.get_note(get_col_by_id(
+        id, "markdown"), extra_params={"SiyuanID": id})
+    if note is None:
+        return
+    noteList.append(note)

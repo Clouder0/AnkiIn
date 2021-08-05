@@ -115,12 +115,16 @@ def get_col_by_id(id: str, attr_name: str):
     return res[0][attr_name]
 
 
+def get_ial_by_id(id: str) -> str:
+    return get_col_by_id(id, "ial").replace("_esc_newline_", "\n")
+
+
 class PropertyNotFoundException(Exception):
     pass
 
 
 def get_property_by_id(id: str, property_name: str):
-    ial = get_col_by_id(id, "ial")
+    ial = get_ial_by_id(id)
     match = re.search(r" {}=\"(.+?)\"".format(property_name),
                       ial, flags=re.DOTALL)
     if match is None:
@@ -130,7 +134,7 @@ def get_property_by_id(id: str, property_name: str):
 
 def do_property_exist_by_id(id: str, property_name: str):
     # print(id)
-    ial = get_col_by_id(id, "ial")
+    ial = get_ial_by_id(id)
     return property_name in ial
 
 

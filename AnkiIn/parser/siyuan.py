@@ -1,3 +1,4 @@
+from AnkiIn.helper.formatHelper import list2str, remove_suffix
 from ..helper.siyuanHelper import PropertyNotFoundException, do_property_exist_by_id, get_parent_by_id
 from ..helper.siyuanHelper import get_property_by_id, query_sql, get_col_by_id
 from . import markdown
@@ -20,6 +21,7 @@ class SyntaxNode:
 
 
 link = {}
+is_added = {}
 roots = []
 noteList = []
 tag_attr_name = "ankilink"
@@ -66,6 +68,7 @@ def build_tree(now: str):
 
 def sync(last_time: str):
     link.clear()
+    is_added.clear()
     roots.clear()
     noteList.clear()
     all_blocks = [x["id"] for x in query_sql(
@@ -115,8 +118,21 @@ def handle(now: SyntaxNode):
 
 
 def addNote(id):
-    note = markdown.get_note(get_col_by_id(
-        id, "markdown"), extra_params={"SiyuanID": id})
+    if is_added.get(id, False):
+        return
+    lines = [x for x in get_col_by_id(id, "markdown").splitlines() if x != ""]
+    text = ""
+    for x in lines:
+        if x.startswith(" "):
+            # duplicate leading space for lists
+            p = 0
+            while x[p] == " ":
+                p = p + 1
+            x = x[:p] + x[:p] + x[p:]
+        text = text + x + "\n"
+    text = remove_suffix(text, "\n")
+    note = markdown.get_note(text, extra_params={"SiyuanID": id})
     if note is None:
         return
     noteList.append(note)
+    is_added[id] = True

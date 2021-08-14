@@ -102,7 +102,7 @@ class NullBlockException(Exception):
 def find_by_id(id: str) -> Block:
     res = query_sql(r"SELECT * FROM blocks WHERE id='{}'".format(id))
     if len(res) <= 0:
-        raise NullBlockException
+        raise NullBlockException(id)
     return Block(res[0])
 
 
@@ -111,7 +111,7 @@ def get_col_by_id(id: str, attr_name: str):
     res = query_sql(
         r"SELECT {} FROM blocks WHERE id='{}'".format(attr_name, id))
     if len(res) <= 0:
-        raise NullBlockException
+        raise NullBlockException(id)
     return res[0][attr_name]
 
 
@@ -128,7 +128,7 @@ def get_property_by_id(id: str, property_name: str):
     match = re.search(r" {}=\"(.+?)\"".format(property_name),
                       ial, flags=re.DOTALL)
     if match is None:
-        raise PropertyNotFoundException
+        raise PropertyNotFoundException(id,property_name)
     return match.group(1)
 
 

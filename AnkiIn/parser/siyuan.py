@@ -70,8 +70,8 @@ async def build_tree(now: str):
 
 
 async def sync(last_time: str):
-    session = aiohttp.ClientSession()
-    set_session(session)
+    # session = aiohttp.ClientSession()
+    # set_session(session)
     link.clear()
     is_added.clear()
     roots.clear()
@@ -88,7 +88,7 @@ async def sync(last_time: str):
     # print([get_col_by_id(x.id,"markdown") for x in roots])
     for x in roots:
         await dfs(x)
-    await session.close()
+    # await session.close()
     return noteList
 
 

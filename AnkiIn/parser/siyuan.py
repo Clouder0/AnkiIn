@@ -1,6 +1,7 @@
 from AnkiIn.helper.formatHelper import list2str, remove_suffix
 from ..helper.siyuanHelper import PropertyNotFoundException, do_property_exist_by_id, get_parent_by_id
 from ..helper.siyuanHelper import get_property_by_id, query_sql, get_col_by_id
+from ..helper.siyuanHelper import set_session
 from . import markdown
 from ..notetype_loader import discovered_notetypes
 from ..notetypes.Siyuan import SQA, SMQA, SCloze, SListCloze, STableCloze
@@ -9,6 +10,8 @@ from ..config import dict as conf
 from ..config import config_updater
 from .. import config
 from ..log import parser_logger as logger
+import asyncio
+import aiohttp
 
 
 class SyntaxNode:
@@ -38,26 +41,26 @@ config_updater.append((update_siyuan_parser, 5))
 update_config()
 
 
-def build_tree(now: str):
+async def build_tree(now: str):
     # print("visit:{}".format(now))
     # print("build tree")
     # print(get_col_by_id(now, "markdown"))
     now_node = SyntaxNode(now)
     link[now] = now_node
     try:
-        if do_property_exist_by_id(now, tag_attr_name):
+        if await do_property_exist_by_id(now, tag_attr_name):
             roots.append(now_node)
             return now_node
     except Exception:
         logger.exception("Exception occurred! Invalid Siyuan ID {}".format(now))
         logger.exception(Exception)
-    fa_id = get_parent_by_id(now)
+    fa_id = await get_parent_by_id(now)
     if fa_id == "":
         return now_node
     # print("son: {} fa:{}".format(now, fa_id))
     fa = link.get(fa_id)
     if fa is None:
-        fa = build_tree(fa_id)
+        fa = await build_tree(fa_id)
     now_node.parent = fa
     # print("fa {} added son {}".format(fa.id, now_node.id))
     fa.sons.append(now_node)
@@ -66,31 +69,37 @@ def build_tree(now: str):
     return now_node
 
 
-def sync(last_time: str):
+async def sync(last_time: str):
+    session = aiohttp.ClientSession()
+    set_session(session)
     link.clear()
     is_added.clear()
     roots.clear()
     noteList.clear()
-    all_blocks = [x["id"] for x in query_sql(
-        r"SELECT id FROM blocks where updated>'{}' and type='p'".format(last_time))]
+    all_origin_blocks = await query_sql(
+        r"SELECT id FROM blocks where updated>'{}' and type='p'".format(last_time))
+    all_blocks = [x["id"] for x in all_origin_blocks]
+    print("Blocks fetched.")
     # print(all_blocks)
     for x in all_blocks:
-        build_tree(x)
+        await build_tree(x)
+    print("Tree built.")
     # print([x.id for x in roots])
     # print([get_col_by_id(x.id,"markdown") for x in roots])
     for x in roots:
-        dfs(x)
+        await dfs(x)
+    await session.close()
     return noteList
 
 
-def dfs(now: SyntaxNode):
+async def dfs(now: SyntaxNode):
     # print("dfs: " + now.id)
     # print([x.id for x in now.sons])
     current_config = None
     config_backup = None
     try:
-        current_config = get_property_by_id(
-            now.id, tag_attr_name).replace(r"&quot;", "\"")
+        current_config = (await get_property_by_id(
+            now.id, tag_attr_name)).replace(r"&quot;", "\"")
         config_backup = config.parse_config(current_config)
     except PropertyNotFoundException:
         logger.info("SiyuanID:{} has not config.".format(now.id))
@@ -101,26 +110,27 @@ def dfs(now: SyntaxNode):
         # print("!!!")
         # print(get_col_by_id(now.id, "markdown"))
         # leaf
-        handle(now)
+        await handle(now)
     else:
         for x in now.sons:
-            dfs(x)
+            await dfs(x)
     if config_backup is not None:
         config.execute_config(config_backup)
 
 
-def handle(now: SyntaxNode):
-    fa = get_parent_by_id(now.id)
-    if get_col_by_id(now.id, "type") == "i" or fa != "" and get_col_by_id(fa, "type") == "i":
-        handle(now.parent)
+async def handle(now: SyntaxNode):
+    fa = await get_parent_by_id(now.id)
+    if (await get_col_by_id(now.id, "type")) == "i" or fa != "" and (await get_col_by_id(fa, "type")) == "i":
+        await handle(now.parent)
     else:
-        addNote(now.id)
+        await addNote(now.id)
 
 
-def addNote(id):
+async def addNote(id):
     if is_added.get(id, False):
         return
-    lines = [x for x in get_col_by_id(id, "markdown").splitlines() if x != ""]
+    origin_markdown = await get_col_by_id(id, "markdown")
+    lines = [x for x in origin_markdown.splitlines() if x != ""]
     text = ""
     for x in lines:
         if x.startswith(" "):

@@ -1,7 +1,6 @@
-from AnkiIn.helper.formatHelper import list2str, remove_suffix
+from AnkiIn.helper.formatHelper import remove_suffix
 from ..helper.siyuanHelper import PropertyNotFoundException, do_property_exist_by_id, get_parent_by_id
 from ..helper.siyuanHelper import get_property_by_id, query_sql, get_col_by_id
-from ..helper.siyuanHelper import set_session
 from . import markdown
 from ..notetype_loader import discovered_notetypes
 from ..notetypes.Siyuan import SQA, SMQA, SCloze, SListCloze, STableCloze
@@ -79,7 +78,7 @@ async def sync(last_time: str):
     all_origin_blocks = await query_sql(
         r"SELECT id FROM blocks where updated>'{}' and type='p'".format(last_time))
     all_blocks = [x["id"] for x in all_origin_blocks]
-    print("Blocks fetched.")
+    print("Blocks fetched.{} in total.".format(len(all_blocks)))
     # print(all_blocks)
     for x in all_blocks:
         await build_tree(x)

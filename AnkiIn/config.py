@@ -59,6 +59,7 @@ dict = {
         "api_url": "http://127.0.0.1:6806/api/",
         "api_token": "",  # TODO not implemented by SiYuan yet
         "custom_attr_name": "custom-ankilink",
+        "assets_replacement": "assets",
     }
 }
 

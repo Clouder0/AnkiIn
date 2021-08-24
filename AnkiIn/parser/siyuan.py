@@ -27,12 +27,15 @@ is_added = {}
 roots = []
 noteList = []
 tag_attr_name = "ankilink"
+assets_replacement = "assets"
 
 
 def update_siyuan_parser():
     global tag_attr_name
+    global assets_replacement
     tag_attr_name = conf["siyuan"].get(
         "custom_attr_name", "custom-ankilink")
+    assets_replacement = conf["siyuan"].get("assets_replacement","assets")
 
 
 discovered_notetypes += [SQA, SMQA, SCloze, SListCloze, STableCloze]
@@ -128,8 +131,16 @@ async def handle(now: SyntaxNode):
 async def addNote(id):
     if is_added.get(id, False):
         return
-    origin_markdown = await get_col_by_id(id, "markdown")
-    lines = [x for x in origin_markdown.splitlines() if x != ""]
+    text = spec_format(await get_col_by_id(id, "markdown"))
+    note = markdown.get_note(text, extra_params={"SiyuanID": id})
+    if note is None:
+        return
+    noteList.append(note)
+    is_added[id] = True
+
+
+def spec_format(text: str) -> str:
+    lines = [x for x in text.splitlines() if x != ""]
     text = ""
     for x in lines:
         if x.startswith(" "):
@@ -140,8 +151,6 @@ async def addNote(id):
             x = x[:p] + x[:p] + x[p:]
         text = text + x + "\n"
     text = remove_suffix(text, "\n")
-    note = markdown.get_note(text, extra_params={"SiyuanID": id})
-    if note is None:
-        return
-    noteList.append(note)
-    is_added[id] = True
+    text = text.replace(
+        r"(assets/", r"({}/".format(assets_replacement))
+    return text

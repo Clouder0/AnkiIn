@@ -3,6 +3,8 @@ import json
 import re
 from ..config import dict as conf
 from ..config import config_updater
+import asyncio
+import aiohttp
 
 
 API_URL = "http://127.0.0.1:6806/api/"
@@ -20,13 +22,18 @@ def update_siyuan_helper():
 config_updater.append((update_siyuan_helper, 5))
 
 
-def post(url: str, **params):
-    try:
-        response = requests.post(url, data=json.dumps(
-            params), headers=HEADERS)
-        return response
-    except Exception:
-        raise Exception
+session = None
+
+
+def set_session(s):
+    global session
+    session = s
+
+
+async def post(url: str, **params):
+    global session
+    async with session.post(url=url, json=params, headers=HEADERS) as resp:
+        return await resp.json()
 
 
 class ApiException(Exception):
@@ -88,8 +95,8 @@ def get_block(dict) -> Block:
 """
 
 
-def query_sql(SQL: str):
-    result = post(API_URL + "query/sql", stmt=SQL).json()
+async def query_sql(SQL: str):
+    result = await post(API_URL + "query/sql", stmt=SQL)
     if result["code"] == 0:
         return result["data"]
     raise ApiException(result)
@@ -99,50 +106,50 @@ class NullBlockException(Exception):
     pass
 
 
-def find_by_id(id: str) -> Block:
-    res = query_sql(r"SELECT * FROM blocks WHERE id='{}'".format(id))
+async def find_by_id(id: str) -> Block:
+    res = await query_sql(r"SELECT * FROM blocks WHERE id='{}'".format(id))
     if len(res) <= 0:
         raise NullBlockException(id)
     return Block(res[0])
 
 
-def get_col_by_id(id: str, attr_name: str):
+async def get_col_by_id(id: str, attr_name: str):
     # print("get_col_by_id", id, attr_name)
-    res = query_sql(
+    res = await query_sql(
         r"SELECT {} FROM blocks WHERE id='{}'".format(attr_name, id))
     if len(res) <= 0:
         raise NullBlockException(id)
     return res[0][attr_name]
 
 
-def get_ial_by_id(id: str) -> str:
-    return get_col_by_id(id, "ial").replace("_esc_newline_", "\n")
+async def get_ial_by_id(id: str) -> str:
+    return (await get_col_by_id(id, "ial")).replace("_esc_newline_", "\n")
 
 
 class PropertyNotFoundException(Exception):
     pass
 
 
-def get_property_by_id(id: str, property_name: str):
-    ial = get_ial_by_id(id)
+async def get_property_by_id(id: str, property_name: str):
+    ial = await get_ial_by_id(id)
     match = re.search(r" {}=\"(.+?)\"".format(property_name),
                       ial, flags=re.DOTALL)
     if match is None:
-        raise PropertyNotFoundException(id,property_name)
+        raise PropertyNotFoundException(id, property_name)
     return match.group(1)
 
 
-def do_property_exist_by_id(id: str, property_name: str):
+async def do_property_exist_by_id(id: str, property_name: str):
     # print(id)
-    ial = get_ial_by_id(id)
+    ial = await get_ial_by_id(id)
     return property_name in ial
 
 
-def get_sons_by_id(id: str):
-    return query_sql(r"SELECT id FROM blocks WHERE parent_id='{}'".format(id))
+async def get_sons_by_id(id: str):
+    return await query_sql(r"SELECT id FROM blocks WHERE parent_id='{}'".format(id))
 
 
-def get_parent_by_id(id: str):
+async def get_parent_by_id(id: str):
     # print("get parent by id: {} parent: {}".format(
     # id, get_col_by_id(id, "parent_id")))
-    return get_col_by_id(id, "parent_id")
+    return await get_col_by_id(id, "parent_id")

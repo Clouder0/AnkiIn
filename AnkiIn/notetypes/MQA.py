@@ -26,7 +26,8 @@ config_updater.append((update_mqa_config, 10))
 
 
 def check(lines: list, extra_params={}) -> bool:
-    return len(lines) >= 2 and len(lines[0]) >= 1 and lines[0][0] == prefix
+    return len(lines) >= 3 and len(lines[0]) >= 1 and lines[0][0] == prefix \
+        and len(lines[1]) >= 1 and lines[1][0] == prefix
 
 
 def get(text: str, deck: str, tags: list, extra_params={}) -> Note:

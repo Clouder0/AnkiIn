@@ -139,6 +139,8 @@ def format_text(text):
     text = markdown2html(text)
     if conf["mathjax"]:
         for key, val in math_dict.items():
+            val = val.replace("<", r"&lt;")
+            val = val.replace(">", r"&gt;")
             text = text.replace(key, r"\({}\)".format(val))
     return text
 

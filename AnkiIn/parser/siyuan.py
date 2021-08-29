@@ -35,7 +35,7 @@ def update_siyuan_parser():
     global assets_replacement
     tag_attr_name = conf["siyuan"].get(
         "custom_attr_name", "custom-ankilink")
-    assets_replacement = conf["siyuan"].get("assets_replacement","assets")
+    assets_replacement = conf["siyuan"].get("assets_replacement", "assets")
 
 
 discovered_notetypes += [SQA, SMQA, SCloze, SListCloze, STableCloze]
@@ -83,8 +83,10 @@ async def sync(last_time: str):
     all_blocks = [x["id"] for x in all_origin_blocks]
     print("Blocks fetched.{} in total.".format(len(all_blocks)))
     # print(all_blocks)
+    tasks = []
     for x in all_blocks:
-        await build_tree(x)
+        tasks.append(asyncio.create_task(build_tree(x)))
+    await asyncio.tasks.gather(*tasks)
     print("Tree built.")
     # print([x.id for x in roots])
     # print([get_col_by_id(x.id,"markdown") for x in roots])
@@ -104,7 +106,7 @@ async def dfs(now: SyntaxNode):
             now.id, tag_attr_name)).replace(r"&quot;", "\"")
         config_backup = config.parse_config(current_config)
     except PropertyNotFoundException:
-        logger.info("SiyuanID:{} has not config.".format(now.id))
+        logger.debug("SiyuanID:{} has no config.".format(now.id))
     except Exception:
         logger.warning(
             "An error occurred while parsing config.\nSiyuanID:{}\nProperty:\n{}".format(now.id, current_config))

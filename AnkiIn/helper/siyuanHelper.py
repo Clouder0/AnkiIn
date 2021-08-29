@@ -136,7 +136,8 @@ async def get_property_by_id(id: str, property_name: str):
                       ial, flags=re.DOTALL)
     if match is None:
         raise PropertyNotFoundException(id, property_name)
-    return match.group(1)
+    res = match.group(1)
+    return res
 
 
 async def do_property_exist_by_id(id: str, property_name: str):

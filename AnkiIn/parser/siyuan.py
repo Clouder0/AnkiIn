@@ -81,13 +81,11 @@ async def sync(last_time: str):
     all_origin_blocks = await query_sql(
         r"SELECT id FROM blocks where updated>'{}' and type='p'".format(last_time))
     all_blocks = [x["id"] for x in all_origin_blocks]
-    print("Blocks fetched.{} in total.".format(len(all_blocks)))
     # print(all_blocks)
     tasks = []
     for x in all_blocks:
         tasks.append(asyncio.create_task(build_tree(x)))
     await asyncio.tasks.gather(*tasks)
-    print("Tree built.")
     # print([x.id for x in roots])
     # print([get_col_by_id(x.id,"markdown") for x in roots])
     for x in roots:

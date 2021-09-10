@@ -94,4 +94,3 @@ def find_notes(query: str):
 
 def update_note_fields(id: str, Note):
     invoke("updateNoteFields", note={"id": id, "fields": Note.outputfields})
-

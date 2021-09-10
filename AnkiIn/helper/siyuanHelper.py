@@ -22,18 +22,10 @@ def update_siyuan_helper():
 config_updater.append((update_siyuan_helper, 5))
 
 
-session = None
-
-
-def set_session(s):
-    global session
-    session = s
-
-
 async def post(url: str, **params):
-    global session
-    async with session.post(url=url, json=params, headers=HEADERS) as resp:
-        return await resp.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url=url, json=params, headers=HEADERS) as resp:
+            return await resp.json()
 
 
 class ApiException(Exception):

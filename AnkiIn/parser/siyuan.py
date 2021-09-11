@@ -3,7 +3,7 @@ from ..helper.siyuanHelper import PropertyNotFoundException, do_property_exist_b
 from ..helper.siyuanHelper import get_property_by_id, query_sql, get_col_by_id
 from . import markdown
 from ..notetype_loader import discovered_notetypes
-from ..notetypes.Siyuan import SQA, SMQA, SCloze, SListCloze, STableCloze
+from ..notetypes.Siyuan import SQA, SMQA, SCloze, SListCloze, STableCloze, SWatch
 from ..config import update_config
 from ..config import dict as conf
 from ..config import config_updater
@@ -38,7 +38,7 @@ def update_siyuan_parser():
     assets_replacement = conf["siyuan"].get("assets_replacement", "assets")
 
 
-discovered_notetypes += [SQA, SMQA, SCloze, SListCloze, STableCloze]
+discovered_notetypes += [SQA, SMQA, SCloze, SListCloze, STableCloze, SWatch]
 config_updater.append((update_siyuan_parser, 5))
 update_config()
 

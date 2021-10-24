@@ -129,6 +129,11 @@ async def get_property_by_id(id: str, property_name: str):
     if match is None:
         raise PropertyNotFoundException(id, property_name)
     res = match.group(1)
+
+    # TODO: bug related, remove later. See https://ld246.com/article/1632151088416
+    res = res.replace(r"&amp;quot;", "\"")
+
+    res = res.replace(r"&quot;", "\"")
     return res
 
 

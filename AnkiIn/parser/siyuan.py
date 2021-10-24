@@ -101,13 +101,13 @@ async def dfs(now: SyntaxNode):
     config_backup = None
     try:
         current_config = (await get_property_by_id(
-            now.id, tag_attr_name)).replace(r"&quot;", "\"")
+            now.id, tag_attr_name))
         config_backup = config.parse_config(current_config)
     except PropertyNotFoundException:
         logger.debug("SiyuanID:{} has no config.".format(now.id))
-    except Exception:
-        logger.warning(
-            "An error occurred while parsing config.\nSiyuanID:{}\nProperty:\n{}".format(now.id, current_config))
+    # except Exception:
+    #    logger.warning(
+    #        "An error occurred while parsing config.\nSiyuanID:{}\nProperty:\n{}".format(now.id, current_config))
     if len(now.sons) == 0:
         # print("!!!")
         # print(get_col_by_id(now.id, "markdown"))

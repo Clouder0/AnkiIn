@@ -74,8 +74,8 @@ def update_config():
 def merge_dictionary(d1: Dict, d2: Dict) -> Dict:
     backup = {}
     for key, val in d2.items():
-        if key in d1 and isinstance(d1[key], collections.Mapping) \
-                and isinstance(val, collections.Mapping):
+        if key in d1 and isinstance(d1[key], collections.abc.Mapping) \
+                and isinstance(val, collections.abc.Mapping):
             backup[key] = merge_dictionary(d1[key], val)
         else:
             backup[key] = d1[key] if key in d1 else None

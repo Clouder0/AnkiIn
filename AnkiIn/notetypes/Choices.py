@@ -74,29 +74,28 @@ FRONT = r"""<!--tuxzz.20201115.v0.r0-->
 <script>
 (function() {
 "use strict";
-function xoshiro128ss(a, b, c, d) {
-  return function() {
-    var t = b << 9, r = a * 5; r = (r << 7 | r >>> 25) * 9;
-    c ^= a; d ^= b;
-    b ^= c; a ^= d; c ^= t;
-    d = d << 11 | d >>> 21;
-    return (r >>> 0) / 4294967296;
-  }
-}
-const date = new Date();
-function pseudo_shuffle_inplace(l) {
-  const rng = xoshiro128ss(date.getFullYear(), date.getMonth(), date.getDay(), 42);
-  let currLen = l.length;
-  while (currLen !== 0) {
-    const t = l[currLen - 1];
-    const idx = Math.floor(rng() * currLen);
-    l[currLen - 1] = l[idx];
-    l[idx] = t;
-    currLen -= 1;
-  }
-  return l;
-}
 
+const date = new Date();
+function pseudo_shuffle_inplace(array) {
+		let seed = date.getDay() * 60 + date.getMinutes();
+    let currentIndex = array.length, temporaryValue, randomIndex;
+    seed = seed || 1;
+    let random = function() {
+      var x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    };
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+      // Pick a remaining element...
+      randomIndex = Math.floor(random() * currentIndex);
+      currentIndex -= 1;
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
+}
 
 const optionBox = document.getElementById("optionBox");
 const optionBuffer = document.getElementById("optionBuffer");
@@ -152,11 +151,11 @@ classifyText.innerText = is_single ? "Single Choice" : "Multiple Choices";
 for(let ii = 0; ii !== optionList.length; ++ii) {
   const i = ii + 0;
   chosenList.push(false);
-
+  
   const checkbox_id = "checkbox-" + i;
   const li = document.createElement("li");
   liList.push(li);
-
+  
   const check = document.createElement("input");
   check.type = is_single ? "radio" : "checkbox";
   check.id = checkbox_id;
@@ -169,14 +168,14 @@ for(let ii = 0; ii !== optionList.length; ++ii) {
     }
     chosenList[i] = this.checked;
   };
-
+  
   const label = document.createElement("label");
   label.htmlFor = checkbox_id;
   label.innerText = optionList[i];
-
+  
   li.appendChild(check);
   li.appendChild(label);
-
+  
   optionBox.appendChild(li);
 }
 
@@ -232,32 +231,27 @@ BACK = r"""<!--tuxzz.20201115.v0.r0-->
 (function() {
 "use strict";
 
-function xoshiro128ss(a, b, c, d) {
-  return function() {
-    var t = b << 9, r = a * 5; r = (r << 7 | r >>> 25) * 9;
-    c ^= a; d ^= b;
-    b ^= c; a ^= d; c ^= t;
-    d = d << 11 | d >>> 21;
-    return (r >>> 0) / 4294967296;
-  }
-}
-
 const date = new Date();
-function pseudo_shuffle_inplace(l) {
-  const rng = xoshiro128ss(date.getFullYear(), date.getMonth(), date.getDay(), 42);
-  let currLen = l.length;
-
-  while (currLen !== 0) {
-    const t = l[currLen - 1];
-    const idx = Math.floor(rng() * currLen);
-    l[currLen - 1] = l[idx];
-    l[idx] = t;
-    currLen -= 1;
-  }
-
-  return l;
+function pseudo_shuffle_inplace(array) {
+		let seed = date.getDay() * 60 + date.getMinutes();
+    let currentIndex = array.length, temporaryValue, randomIndex;
+    seed = seed || 1;
+    let random = function() {
+      var x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    };
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+      // Pick a remaining element...
+      randomIndex = Math.floor(random() * currentIndex);
+      currentIndex -= 1;
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
 }
-
 
 const optionBox = document.getElementById("optionBox");
 const optionBuffer = document.getElementById("optionBuffer");
@@ -313,11 +307,11 @@ classifyText.innerText = is_single ? "Single Choice" : "Multiple Choices";
 for(let ii = 0; ii !== optionList.length; ++ii) {
   const i = ii + 0;
   chosenList.push(false);
-
+  
   const checkbox_id = "checkbox-" + i;
   const li = document.createElement("li");
   liList.push(li);
-
+  
   const check = document.createElement("input");
   check.type = is_single ? "radio" : "checkbox";
   check.id = checkbox_id;
@@ -330,14 +324,14 @@ for(let ii = 0; ii !== optionList.length; ++ii) {
     }
     chosenList[i] = this.checked;
   };
-
+  
   const label = document.createElement("label");
   label.htmlFor = checkbox_id;
   label.innerText = optionList[i];
-
+  
   li.appendChild(check);
   li.appendChild(label);
-
+  
   optionBox.appendChild(li);
 }
 

@@ -8,7 +8,8 @@ def check_online():
     try:
         get_deck_names()
     except Exception:
-        log.error("Can't connect to anki-connnect.")
+        base_url = conf.get("anki_connect_base_url", "http://localhost:8765")
+        log.error("Can't connect to anki-connnect. url:%s", base_url)
         return False
     return True
 
@@ -17,10 +18,8 @@ def request(action, **params):
     return {"action": action, "params": params, "version": 6}
 
 
-base_url = conf.get("anki_connect_base_url", "http://localhost:8765")
-
-
 def invoke(action, **params):
+    base_url = conf.get("anki_connect_base_url", "http://localhost:8765")
     requestJson = json.dumps(request(action, **params)).encode("utf-8")
     response = json.load(urllib.request.urlopen(
         urllib.request.Request(base_url, requestJson)))

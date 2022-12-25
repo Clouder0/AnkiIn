@@ -2,3 +2,4 @@ __pycache__/
 dist/
 AnkiIn.egg-info/
 AnkiIn_Clouder.egg-info/
+build
